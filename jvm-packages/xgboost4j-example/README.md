@@ -27,3 +27,7 @@ XGBoost4J Code Examples
 
 ## Flink API
 * [Distributed Training with Flink](src/main/scala/ml/dmlc/xgboost4j/scala/example/flink/DistTrainWithFlink.scala)
+
+## Spark testing
+Data:
+https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html#breast-cancer
