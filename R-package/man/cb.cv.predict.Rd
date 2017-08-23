@@ -34,10 +34,10 @@ Callback function expects the following values to be set in its calling frame:
 \code{basket},
 \code{data},
 \code{end_iteration},
+\code{params},
 \code{num_parallel_tree},
 \code{num_class}.
 }
 \seealso{
 \code{\link{callbacks}}
 }
-

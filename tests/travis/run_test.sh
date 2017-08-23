@@ -18,7 +18,12 @@ make -f dmlc-core/scripts/packages.mk lz4
 
 
 if [ ${TRAVIS_OS_NAME} == "osx" ]; then
-    echo "USE_OPENMP=0" >> config.mk
+    echo 'USE_OPENMP=0' >> config.mk
+    echo 'TMPVAR := $(XGB_PLUGINS)' >> config.mk
+    echo 'XGB_PLUGINS = $(filter-out plugin/lz4/plugin.mk, $(TMPVAR))' >> config.mk
+else
+    # use g++-4.8 for linux
+    export CXX=g++-4.8
 fi
 
 if [ ${TASK} == "python_test" ]; then
@@ -76,10 +81,9 @@ fi
 
 if [ ${TASK} == "java_test" ]; then
     set -e
-    make jvm-packages
     cd jvm-packages
-    mvn clean install -DskipTests=true
-    mvn test
+    mvn -q clean install -DskipTests -Dmaven.test.skip
+    mvn -q test
 fi
 
 if [ ${TASK} == "cmake_test" ]; then
@@ -87,4 +91,12 @@ if [ ${TASK} == "cmake_test" ]; then
     cd build
     cmake ..
     make
+fi
+
+if [ ${TASK} == "cpp_test" ]; then
+    set -e
+    make -f dmlc-core/scripts/packages.mk gtest
+    echo "TEST_COVER=1" >> config.mk
+    echo "GTEST_PATH="${CACHE_PREFIX} >> config.mk
+    make cover
 fi

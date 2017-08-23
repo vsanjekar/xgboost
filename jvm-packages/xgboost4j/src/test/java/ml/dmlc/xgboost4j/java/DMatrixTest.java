@@ -15,15 +15,11 @@
  */
 package ml.dmlc.xgboost4j.java;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Random;
 
 import junit.framework.TestCase;
 import ml.dmlc.xgboost4j.LabeledPoint;
-import ml.dmlc.xgboost4j.java.DMatrix;
-import ml.dmlc.xgboost4j.java.DataBatch;
-import ml.dmlc.xgboost4j.java.XGBoostError;
 import org.junit.Test;
 
 /**
@@ -41,10 +37,10 @@ public class DMatrixTest {
     int nrep = 3000;
     java.util.List<LabeledPoint> blist = new java.util.LinkedList<LabeledPoint>();
     for (int i = 0; i < nrep; ++i) {
-      LabeledPoint p = LabeledPoint.fromSparseVector(
+      LabeledPoint p = new LabeledPoint(
               0.1f + i, new int[]{0, 2, 3}, new float[]{3, 4, 5});
       blist.add(p);
-      labelall.add(p.label);
+      labelall.add(p.label());
     }
     DMatrix dmat = new DMatrix(blist.iterator(), null);
     // get label
@@ -86,6 +82,78 @@ public class DMatrixTest {
     TestCase.assertTrue(dmat1.rowNum() == 3);
     //test set label
     float[] label1 = new float[]{1, 0, 1};
+    dmat1.setLabel(label1);
+    float[] label2 = dmat1.getLabel();
+    TestCase.assertTrue(Arrays.equals(label1, label2));
+  }
+
+  @Test
+  public void testCreateFromCSREx() throws XGBoostError {
+    //create Matrix from csr format sparse Matrix and labels
+    /**
+     * sparse matrix
+     * 1 0 2 3 0
+     * 4 0 2 3 5
+     * 3 1 2 5 0
+     */
+    float[] data = new float[]{1, 2, 3, 4, 2, 3, 5, 3, 1, 2, 5};
+    int[] colIndex = new int[]{0, 2, 3, 0, 2, 3, 4, 0, 1, 2, 3};
+    long[] rowHeaders = new long[]{0, 3, 7, 11};
+    DMatrix dmat1 = new DMatrix(rowHeaders, colIndex, data, DMatrix.SparseType.CSR, 5);
+    //check row num
+    TestCase.assertTrue(dmat1.rowNum() == 3);
+    //test set label
+    float[] label1 = new float[]{1, 0, 1};
+    dmat1.setLabel(label1);
+    float[] label2 = dmat1.getLabel();
+    TestCase.assertTrue(Arrays.equals(label1, label2));
+  }
+
+  @Test
+  public void testCreateFromCSC() throws XGBoostError {
+    //create Matrix from csc format sparse Matrix and labels
+    /**
+     * sparse matrix
+     * 1 0 2
+     * 3 0 4
+     * 0 2 3
+     * 5 3 1
+     * 2 5 0
+     */
+    float[] data = new float[]{1, 3, 5, 2, 2, 3, 5, 2, 4, 3, 1};
+    int[] rowIndex = new int[]{0, 1, 3, 4, 2, 3, 4, 0, 1, 2, 3};
+    long[] colHeaders = new long[]{0, 4, 7, 11};
+    DMatrix dmat1 = new DMatrix(colHeaders, rowIndex, data, DMatrix.SparseType.CSC);
+    //check row num
+    System.out.println(dmat1.rowNum());
+    TestCase.assertTrue(dmat1.rowNum() == 5);
+    //test set label
+    float[] label1 = new float[]{1, 0, 1, 1, 1};
+    dmat1.setLabel(label1);
+    float[] label2 = dmat1.getLabel();
+    TestCase.assertTrue(Arrays.equals(label1, label2));
+  }
+
+  @Test
+  public void testCreateFromCSCEx() throws XGBoostError {
+    //create Matrix from csc format sparse Matrix and labels
+    /**
+     * sparse matrix
+     * 1 0 2
+     * 3 0 4
+     * 0 2 3
+     * 5 3 1
+     * 2 5 0
+     */
+    float[] data = new float[]{1, 3, 5, 2, 2, 3, 5, 2, 4, 3, 1};
+    int[] rowIndex = new int[]{0, 1, 3, 4, 2, 3, 4, 0, 1, 2, 3};
+    long[] colHeaders = new long[]{0, 4, 7, 11};
+    DMatrix dmat1 = new DMatrix(colHeaders, rowIndex, data, DMatrix.SparseType.CSC, 5);
+    //check row num
+    System.out.println(dmat1.rowNum());
+    TestCase.assertTrue(dmat1.rowNum() == 5);
+    //test set label
+    float[] label1 = new float[]{1, 0, 1, 1, 1};
     dmat1.setLabel(label1);
     float[] label2 = dmat1.getLabel();
     TestCase.assertTrue(Arrays.equals(label1, label2));
