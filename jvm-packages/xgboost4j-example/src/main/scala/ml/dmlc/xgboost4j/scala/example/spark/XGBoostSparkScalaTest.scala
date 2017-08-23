@@ -1,5 +1,6 @@
 package ml.dmlc.xgboost4j.scala.example.spark
 
+import ml.dmlc.xgboost4j.scala.Booster
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import ml.dmlc.xgboost4j.scala.spark.XGBoost
@@ -25,8 +26,8 @@ object XGBoostSparkScalaTest {
     val numWorkers = args(4).toInt
     */
 
-    val inputTrainPath = "xgboost4j-example/data/cod-rna"
-    val inputTestPath = "xgboost4j-example/data/cod-rna.t"
+    val inputTrainPath = "xgboost4j-example/data/liver-disorders"
+    val inputTestPath = "xgboost4j-example/data/liver-disorders.t"
     val outputPath = "xgboost4j-example/data/output"
     val numRound = 10
     val numWorkers = 10
@@ -34,12 +35,14 @@ object XGBoostSparkScalaTest {
     // spark initialization
     val sparkConf = new SparkConf()
       .setAppName("Test XGBoost")
-      .setMaster("local[2]")
+      .setMaster("local[1]")
     val sc = new SparkContext(sparkConf)
 
     // data
     val trainRDD = MLUtils.loadLibSVMFile(sc, inputTrainPath)
-    val testRDD = MLUtils.loadLibSVMFile(sc, inputTestPath)
+    // val testRDD = MLUtils.loadLibSVMFile(sc, inputTestPath)
+
+    trainRDD.collect().foreach(println)
 
     // parameters
     val paramMap = List(
